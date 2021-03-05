@@ -62,11 +62,13 @@ class main implements renderable, templatable {
     /**
      * main constructor.
      *
+     * @param string $course Constant course value from ../course_activities/lib.php
      * @param string $order Constant sort value from ../course_activities/lib.php
      * @param string $filter Constant filter value from ../course_activities/lib.php
      * @param string $limit Constant limit value from ../course_activities/lib.php
      */
-    public function __construct($order, $filter, $limit) {
+    public function __construct($order, $filter, $limit, $course) {
+        $this->course = $course ? $course : BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE1;
         $this->order = $order ? $order : BLOCK_COURSE_ACTIVITIES_SORT_BY_DATES;
         $this->filter = $filter ? $filter : BLOCK_COURSE_ACTIVITIES_FILTER_BY_7_DAYS;
         $this->limit = $limit ? $limit : BLOCK_COURSE_ACTIVITIES_ACTIVITIES_LIMIT_DEFAULT;
@@ -95,6 +97,28 @@ class main implements renderable, templatable {
     }
 
     /**
+     * Test the available filters with the current user preference and return an array with
+     * bool flags corresponding to which is active
+     *
+     * @return array
+     */
+    protected function get_course_as_booleans() {
+        $courses = [
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE1 => false,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE2 => false,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE3 => false,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE4 => false,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE5 => false,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE6 => false
+        ];
+
+        // Set the selected filter to true.
+        $courses[$this->course] = true;
+
+        return $courses;
+    }
+
+    /**
      * Get the offset/limit values corresponding to $this->filter
      * which are used to send through to the context as default values
      *
@@ -103,6 +127,7 @@ class main implements renderable, templatable {
     private function get_filter_offsets() {
 
         $limit = false;
+
         if (in_array($this->filter, [BLOCK_COURSE_ACTIVITIES_FILTER_BY_NONE, BLOCK_COURSE_ACTIVITIES_FILTER_BY_OVERDUE])) {
             $offset = -14;
             if ($this->filter == BLOCK_COURSE_ACTIVITIES_FILTER_BY_OVERDUE) {
@@ -138,7 +163,7 @@ class main implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output) {
-
+        global $DB;
         $nocoursesurl = $output->image_url('courses', 'block_course_activities')->out();
         $noeventsurl = $output->image_url('activities', 'block_course_activities')->out();
 
@@ -157,9 +182,21 @@ class main implements renderable, templatable {
             return $exporter->export($output);
         }, $inprogresscourses);
 
+        $courses = $DB->get_records('course');
+        $listCourses = [];
+        foreach ($courses as $course) {
+            array_push($listCourses, (object)[
+                'id' => $course->id,
+                'name' => $course->fullname,
+                'datafilter' => 'course'.$course->id,
+            ]);
+        }
+
         $filters = $this->get_filters_as_booleans();
         $offsets = $this->get_filter_offsets();
+//        $courseID = $this->get_course_as_booleans();
         $contextvariables = [
+            'selectorcourse' => $listCourses,
             'midnight' => usergetmidnight(time()),
             'coursepages' => [$formattedcourses],
             'urls' => [
@@ -168,6 +205,7 @@ class main implements renderable, templatable {
             ],
             'sortcourseactivitiescourses' => $this->order == BLOCK_COURSE_ACTIVITIES_SORT_BY_COURSES,
             'selectedfilter' => $this->filter,
+            'selectedcourse' => $this->course,
             'hasdaysoffset' => true,
             'hasdayslimit' => $offsets['dayslimit'] !== false ,
             'nodayslimit' => $offsets['dayslimit'] === false ,

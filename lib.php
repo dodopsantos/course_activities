@@ -30,6 +30,16 @@ defined('MOODLE_INTERNAL') || die();
 define('BLOCK_COURSE_ACTIVITIES_SORT_BY_COURSES', 'sortbycourses');
 
 /**
+ * Define constants to store the SORT user preference
+ */
+define('BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE1', 'course1');
+define('BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE2', 'course2');
+define('BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE3', 'course3');
+define('BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE4', 'course4');
+define('BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE5', 'course5');
+define('BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE6', 'course6');
+
+/**
  * Define constants to store the FILTER user preference
  */
 define('BLOCK_COURSE_ACTIVITIES_FILTER_BY_NONE', 'all');
@@ -55,7 +65,7 @@ function block_course_activities_user_preferences() {
 
     $preferences['block_course_activities_user_filter_preference'] = array(
         'null' => NULL_NOT_ALLOWED,
-        'default' => BLOCK_COURSE_ACTIVITIES_FILTER_BY_30_DAYS,
+        'default' => BLOCK_COURSE_ACTIVITIES_FILTER_BY_NONE,
         'type' => PARAM_ALPHANUM,
         'choices' => array(
                 BLOCK_COURSE_ACTIVITIES_FILTER_BY_NONE,
@@ -64,6 +74,20 @@ function block_course_activities_user_preferences() {
                 BLOCK_COURSE_ACTIVITIES_FILTER_BY_30_DAYS,
                 BLOCK_COURSE_ACTIVITIES_FILTER_BY_3_MONTHS,
                 BLOCK_COURSE_ACTIVITIES_FILTER_BY_6_MONTHS
+        )
+    );
+
+    $preferences['block_course_activities_user_course_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE1,
+        'type' => PARAM_ALPHANUM,
+        'choices' => array(
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE1,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE2,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE3,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE4,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE5,
+            BLOCK_COURSE_ACTIVITIES_FILTER_BY_COURSE6
         )
     );
 

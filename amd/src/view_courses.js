@@ -44,8 +44,8 @@ function(
 ) {
 
     var SELECTORS = {
-        MORE_COURSES_BUTTON: '[data-action="more-courses"]',
-        MORE_COURSES_BUTTON_CONTAINER: '[data-region="more-courses-button-container"]',
+        COURSE_ACTIVITIES_DAY_FILTER: '[data-region="course-filter"]',
+        COURSE_ACTIVITIES_DAY_FILTER_OPTION: '[data-from]',
         NO_COURSES_EMPTY_MESSAGE: '[data-region="no-courses-empty-message"]',
         COURSES_LIST: '[data-region="courses-list"]',
         COURSE_ITEMS_LOADING_PLACEHOLDER: '[data-region="course-items-loading-placeholder"]',
@@ -97,30 +97,30 @@ function(
      *
      * @param {object} root The rool element.
      */
-    var enableMoreCoursesButtonLoading = function(root) {
-        var button = root.find(SELECTORS.MORE_COURSES_BUTTON);
-        button.prop('disabled', true);
-        Templates.render(TEMPLATES.LOADING_ICON, {})
-            .then(function(html) {
-                button.append(html);
-                return html;
-            })
-            .catch(function() {
-                // It's not important if this false so just do so silently.
-                return false;
-            });
-    };
+    // var enableMoreCoursesButtonLoading = function(root) {
+    //     var button = root.find(SELECTORS.MORE_COURSES_BUTTON);
+    //     button.prop('disabled', true);
+    //     Templates.render(TEMPLATES.LOADING_ICON, {})
+    //         .then(function(html) {
+    //             button.append(html);
+    //             return html;
+    //         })
+    //         .catch(function() {
+    //             // It's not important if this false so just do so silently.
+    //             return false;
+    //         });
+    // };
 
     /**
      * Enable the "more courses" button and remove the loading spinner.
      *
      * @param {object} root The rool element.
      */
-    var disableMoreCoursesButtonLoading = function(root) {
-        var button = root.find(SELECTORS.MORE_COURSES_BUTTON);
-        button.prop('disabled', false);
-        button.find(SELECTORS.LOADING_ICON).remove();
-    };
+    // var disableMoreCoursesButtonLoading = function(root) {
+    //     var button = root.find(SELECTORS.MORE_COURSES_BUTTON);
+    //     button.prop('disabled', false);
+    //     button.find(SELECTORS.LOADING_ICON).remove();
+    // };
 
     /**
      * Display the message for when there are no courses available.
@@ -203,6 +203,11 @@ function(
     var getDaysLimit = function(root) {
         var daysLimit = root.attr('data-days-limit');
         return daysLimit != undefined ? parseInt(daysLimit, 10) : undefined;
+    };
+
+    var getCourseId = function(root) {
+        var courseIdentify = root.attr('data-course');
+        return courseIdentify != undefined ? courseIdentify: undefined;
     };
 
     /**
@@ -325,11 +330,17 @@ function(
      * @param {Number} daysLimit Number of days from today to limit the events to.
      * @param {string} noEventsURL URL for the image to display for no events.
      * @return {object} jQuery promise resolved after rendering is complete.
+     * @param {string} courseIdentify identifier of course.
      */
-    var updateDisplayFromCourses = function(courses, root, midnight, daysOffset, daysLimit, noEventsURL) {
-        // Render the courses template.
+    var updateDisplayFromCourses = function(courses, root, midnight, daysOffset, daysLimit, noEventsURL, courseIdentify) {
+        let courseA = 'undefined';
+        courses.forEach(function(course) {
+            if('course'+course.id == courseIdentify){
+                courseA = course;
+            }
+        });
         return Templates.render(TEMPLATES.COURSE_ITEMS, {
-            courses: courses,
+            courses: courseA,
             midnight: midnight,
             hasdaysoffset: true,
             hasdayslimit: daysLimit != undefined,
@@ -399,13 +410,15 @@ function(
             var midnight = getMidnight(root);
             var startTime = getStartTime(root);
             var endTime = getEndTime(root);
+            var courseIdentify = getCourseId(root);
             var noEventsURL = root.attr('data-no-events-url');
             // Record the next offset if we want to request more courses.
             setOffset(root, nextOffset);
             // Load the events for these courses.
             var eventsPromise = loadEventsForCourses(courses, startTime, endTime);
             // Render the courses in the DOM.
-            var renderPromise = updateDisplayFromCourses(courses, root, midnight, daysOffset, daysLimit, noEventsURL);
+            var renderPromise = updateDisplayFromCourses(courses, root, midnight,
+                daysOffset, daysLimit, noEventsURL, courseIdentify);
 
             return $.when(eventsPromise, renderPromise)
                 .then(function(eventsByCourse) {
@@ -519,19 +532,15 @@ function(
      * @param {object} root The root element for the course activities courses view.
      */
     var registerEventListeners = function(root) {
-        CustomEvents.define(root, [CustomEvents.events.activate]);
-        // Show more courses and load their events when the user clicks the "more courses"
-        // button.
-        root.on(CustomEvents.events.activate, SELECTORS.MORE_COURSES_BUTTON, function(e, data) {
-            enableMoreCoursesButtonLoading(root);
-            loadMoreCourses(root)
-                .then(function() {
-                    disableMoreCoursesButtonLoading(root);
-                    return;
-                })
-                .catch(function() {
-                    disableMoreCoursesButtonLoading(root);
-                });
+        var courseActivitiesDaySelectorContainer = root.find(SELECTORS.COURSE_ACTIVITIES_DAY_FILTER);
+
+        CustomEvents.define(courseActivitiesDaySelectorContainer, [CustomEvents.events.activate]);
+        courseActivitiesDaySelectorContainer.on(
+            CustomEvents.events.activate,
+            SELECTORS.COURSE_ACTIVITIES_DAY_FILTER_OPTION,
+            function(e, data) {
+            alert("porrra");
+            loadMoreCourses(root);
 
             if (data) {
                 data.originalEvent.preventDefault();
@@ -583,6 +592,7 @@ function(
      *
      * @param {object} root The root element for the course activities courses view.
      */
+
     var shown = function(root) {
         if (!root.attr('data-seen')) {
             if (hasLoadedCourses(root)) {

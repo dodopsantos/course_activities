@@ -53,8 +53,9 @@ class block_course_activities extends block_base {
         $sort = get_user_preferences('block_course_activities_user_sort_preference');
         $filter = get_user_preferences('block_course_activities_user_filter_preference');
         $limit = get_user_preferences('block_course_activities_user_limit_preference');
+        $course = get_user_preferences('block_course_activities_user_course_preference');
 
-        $renderable = new \block_course_activities\output\main($sort, $filter, $limit);
+        $renderable = new \block_course_activities\output\main($sort, $filter, $limit, $course);
         $renderer = $this->page->get_renderer('block_course_activities');
 
         $this->content = (object) [

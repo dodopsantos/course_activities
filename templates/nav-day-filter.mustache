@@ -22,92 +22,25 @@
     Example context (json):
     {}
 }}
-<div data-region="day-filter" class="dropdown">
+<div data-region="course-filter" class="dropdown">
     <button type="button" class="btn btn-outline-secondary dropdown-toggle icon-no-margin" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            aria-label="{{#str}} ariadayfilter, block_course_activities {{/str}}" aria-controls="menudayfilter">
-        {{#pix}} i/duration {{/pix}}
-        <span class="sr-only" data-active-item-text>
-            {{#all}} {{#str}} all, core {{/str}} {{/all}}
-            {{#overdue}} {{#str}} overdue, block_course_activities {{/str}} {{/overdue}}
-            {{#next7days}} {{#str}}next7days, block_course_activities {{/str}} {{/next7days}}
-            {{#next30days}} {{#str}}next30days, block_course_activities {{/str}} {{/next30days}}
-            {{#next3months}} {{#str}}next3months, block_course_activities {{/str}} {{/next3months}}
-            {{#next6months}} {{#str}}next6months, block_course_activities {{/str}} {{/next6months}}
-        </span>
+            aria-label="{{#str}} ariadayfilter, block_course_activities {{/str}}" aria-controls="menucoursefilter">
+        Selecione um curso
     </button>
-    <div id="menudayfilter" role="menu" class="dropdown-menu" data-show-active-item data-skip-active-class="true">
-        <a
-            class="dropdown-item"
-            href="#"
-            data-from="-14"
-            data-filtername="all"
-            {{#all}}aria-current="true"{{/all}}
-            aria-label="{{#str}} ariadayfilteroption, block_course_activities, {{#str}} all, core {{/str}}{{/str}}"
-            role="menuitem"
-        >
-            {{#str}} all, core {{/str}}
-        </a>
-        <a
-            class="dropdown-item"
-            href="#"
-            data-from="-14"
-            data-to="0"
-            data-filtername="overdue"
-            {{#overdue}}aria-current="true"{{/overdue}}
-            aria-label="{{#str}} ariadayfilteroption, block_course_activities, {{#str}} overdue, block_course_activities {{/str}}{{/str}}"
-            role="menuitem"
-        >
-            {{#str}} overdue, block_course_activities {{/str}}
-        </a>
-        <div class="dropdown-divider" role="separator"></div>
-        <h6 class="dropdown-header">{{#str}} duedate, block_course_activities {{/str}}</h6>
-        <a
-            class="dropdown-item"
-            href="#"
-            data-from="0"
-            data-to="7"
-            data-filtername="next7days"
-            {{#next7days}}aria-current="true"{{/next7days}}
-            aria-label="{{#str}} ariadayfilteroption, block_course_activities, {{#str}} next7days, block_course_activities {{/str}}{{/str}}"
-            role="menuitem"
-        >
-            {{#str}} next7days, block_course_activities {{/str}}
-        </a>
-        <a
-            class="dropdown-item"
-            href="#"
-            data-from="0"
-            data-to="30"
-            data-filtername="next30days"
-            {{#next30days}}aria-current="true"{{/next30days}}
-            aria-label="{{#str}} ariadayfilteroption, block_course_activities, {{#str}} next30days, block_course_activities {{/str}}{{/str}}"
-            role="menuitem"
-        >
-            {{#str}} next30days, block_course_activities {{/str}}
-        </a>
-        <a
-            class="dropdown-item"
-            href="#"
-            data-from="0"
-            data-to="90"
-            data-filtername="next3months"
-            {{#next3months}}aria-current="true"{{/next3months}}
-            aria-label="{{#str}} ariadayfilteroption, block_course_activities, {{#str}} next3months, block_course_activities {{/str}}{{/str}}"
-            role="menuitem"
-        >
-            {{#str}} next3months, block_course_activities {{/str}}
-        </a>
-        <a
-            class="dropdown-item {{#next6months}} active {{/next6months}}"
-            href="#"
-            data-from="0"
-            data-to="180"
-            data-filtername="next6months"
-            {{#next6months}}aria-current="true"{{/next6months}}
-            aria-label="{{#str}} ariadayfilteroption, block_course_activities, {{#str}} next6months, block_course_activities {{/str}}{{/str}}"
-            role="menuitem"
-        >
-            {{#str}} next6months, block_course_activities {{/str}}
-        </a>
+    <div id="menucoursefilter" role="menu" class="dropdown-menu" data-show-active-item data-skip-active-class="true">
+        {{#selectorcourse}}
+            <a
+                class="dropdown-item"
+                href="#"
+                data-from="-14"
+                data-action="more-courses"
+                data-filtername="{{datafilter}}"
+                {{#course}}aria-current="true"{{/course}}
+                aria-label="{{#str}} ariadayfilteroption, block_course_activities, {{#str}} all, core {{/str}}{{/str}}"
+                role="menuitem"
+            >
+                {{name}}
+            </a>
+        {{/selectorcourse}}
     </div>
 </div>

@@ -45,6 +45,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         $collection->add_user_preference('block_course_activities_user_sort_preference', 'privacy:metadata:courseactivitiessortpreference');
         $collection->add_user_preference('block_course_activities_user_filter_preference', 'privacy:metadata:courseactivitiesfilterpreference');
         $collection->add_user_preference('block_course_activities_user_limit_preference', 'privacy:metadata:courseactivitieslimitpreference');
+        $collection->add_user_preference('block_course_activities_user_course_preference', 'privacy:metadata:courseactivitiescoursepreference');
         return $collection;
     }
 
@@ -67,6 +68,14 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             \core_privacy\local\request\writer::export_user_preference('block_course_activities', 'block_course_activities_user_filter_preference',
                     get_string($preference, 'block_course_activities'),
                     get_string('privacy:metadata:courseactivitiesfilterpreference', 'block_course_activities')
+            );
+        }
+
+        $preference = get_user_preferences('block_course_activities_user_course_preference', null, $userid);
+        if (isset($preference)) {
+            \core_privacy\local\request\writer::export_user_preference('block_course_activities', 'block_course_activities_user_course_preference',
+                get_string($preference, 'block_course_activities'),
+                get_string('privacy:metadata:courseactivitiescoursepreference', 'block_course_activities')
             );
         }
 

@@ -27,22 +27,25 @@ define(
     'core/custom_interaction_events',
     'block_course_activities/view',
     'core/ajax',
-    'core/notification'
+    'core/notification',
+    'block_course_activities/view_courses'
 ],
 function(
     $,
     CustomEvents,
     View,
     Ajax,
-    Notification
+    Notification,
+    ViewCourses
 ) {
 
     var SELECTORS = {
-        COURSE_ACTIVITIES_DAY_FILTER: '[data-region="day-filter"]',
+        COURSE_ACTIVITIES_DAY_FILTER: '[data-region="course-filter"]',
         COURSE_ACTIVITIES_DAY_FILTER_OPTION: '[data-from]',
         COURSE_ACTIVITIES_VIEW_SELECTOR: '[data-region="view-selector"]',
         DATA_DAYS_OFFSET: '[data-days-offset]',
         DATA_DAYS_LIMIT: '[data-days-limit]',
+        COURSE_ACTIVITIES_COURSES_VIEW: '[data-region="view-courses"]',
     };
 
     /**
@@ -75,6 +78,7 @@ function(
      * @param {object} courseActivitiesViewRoot The root element for the course activities view
      */
     var registerCourseActivitiesDaySelector = function(root, courseActivitiesViewRoot) {
+
         var courseActivitiesDaySelectorContainer = root.find(SELECTORS.COURSE_ACTIVITIES_DAY_FILTER);
 
         CustomEvents.define(courseActivitiesDaySelectorContainer, [CustomEvents.events.activate]);
@@ -84,7 +88,7 @@ function(
             function(e, data) {
                 // Update the user preference
                 var filtername = $(e.currentTarget).data('filtername');
-                var type = 'block_course_activities_user_filter_preference';
+                var type = 'block_course_activities_user_course_preference';
                 updateUserPreferences(type, filtername);
 
                 var option = $(e.target).closest(SELECTORS.COURSE_ACTIVITIES_DAY_FILTER_OPTION);
@@ -96,16 +100,16 @@ function(
 
                 var daysOffset = option.attr('data-from');
                 var daysLimit = option.attr('data-to');
+                var course = option.attr('data-course');
                 var elementsWithDaysOffset = root.find(SELECTORS.DATA_DAYS_OFFSET);
 
                 elementsWithDaysOffset.attr('data-days-offset', daysOffset);
-
+                elementsWithDaysOffset.attr('data-course-id', course);
                 if (daysLimit != undefined) {
                     elementsWithDaysOffset.attr('data-days-limit', daysLimit);
                 } else {
                     elementsWithDaysOffset.removeAttr('data-days-limit');
                 }
-
                 // Reset the views to reinitialise the event lists now that we've
                 // updated the day limits.
                 View.reset(courseActivitiesViewRoot);
@@ -158,7 +162,36 @@ function(
         registerViewSelector(root, courseActivitiesViewRoot);
     };
 
+    /**
+     * Reset the course activities dates and courses views to their original
+     * state on first page load.
+     *
+     * This is called when configuration has changed for the event lists
+     * to cause them to reload their data.
+     *
+     * @param {object} root The root element for the course activities view.
+     */
+    var reset = function(root) {
+        var coursesViewRoot = root.find(SELECTORS.COURSE_ACTIVITIES_COURSES_VIEW);
+        ViewCourses.reset(coursesViewRoot);
+    };
+
+    /**
+     * Tell the course activities dates or courses view that it has been displayed.
+     *
+     * This is called each time one of the views is displayed and is used to
+     * lazy load the data within it on first load.
+     *
+     * @param {object} root The root element for the course activities view.
+     */
+    var shown = function(root) {
+        var coursesViewRoot = root.find(SELECTORS.COURSE_ACTIVITIES_COURSES_VIEW);
+        ViewCourses.shown(coursesViewRoot);
+    };
+
     return {
-        init: init
+        init: init,
+        reset:reset,
+        shown:shown,
     };
 });
